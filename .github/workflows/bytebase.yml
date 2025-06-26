@@ -1,0 +1,35 @@
+name: Bytebase CI/CD Demo
+
+on:
+  push:
+    paths:
+      - "migrations/*.sql"
+      - "bytebase.yaml"
+
+jobs:
+  bytebase-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PostgreSQL Client
+        run: sudo apt-get install -y postgresql-client
+
+      - name: Debug Secrets (Optional)
+        run: |
+          echo "HOST=$DB_HOST"
+          echo "DB=$DB_NAME"
+
+      - name: Apply migrations manually
+        run: |
+          for file in $(ls migrations/*.sql | sort); do
+            echo "Applying $file"
+            PGPASSWORD=$DB_PASS psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f $file
+          done
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
