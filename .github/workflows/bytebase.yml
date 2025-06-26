@@ -14,7 +14,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup PostgreSQL Client
-        run: sudo apt-get install -y postgresql-client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
 
       - name: Debug Secrets (Optional)
         run: |
