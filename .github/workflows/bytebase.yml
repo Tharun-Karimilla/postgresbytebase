@@ -27,8 +27,12 @@ jobs:
         run: |
           for file in $(ls migrations/*.sql | sort); do
             echo "Applying $file"
-            PGPASSWORD=$DB_PASS psql -h $DB_HOST -U $DB_USER -d $DB_NAME -f $file
-          done
+            PGPASSWORD=$DB_PASS psql -h $DB_HOST -U $DB_USER -d $DB_NAME 
+            <<EOF SET search_path TO your_schema, public;
+            \i $file 
+            EOF 
+            done
+
         env:
           DB_HOST: ${{ secrets.DB_HOST }}
           DB_PORT: ${{ secrets.DB_PORT }}
